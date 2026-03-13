@@ -3,194 +3,541 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Test API Microservices</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Microservices Console</title>
     <style>
-        body {
-            font-family: sans-serif;
-            max-width: 800px;
-            margin: 20px auto;
-            padding: 20px;
-            line-height: 1.6;
-            background: #f9f9f9;
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600&family=Source+Code+Pro:wght@400;600&display=swap');
+
+        :root {
+            --bg: #f1f4f8;
+            --bg-accent: #dfe7f3;
+            --card: #ffffff;
+            --text: #1f2937;
+            --muted: #6b7280;
+            --accent: #0f766e;
+            --accent-strong: #0b4f4b;
+            --warning: #b45309;
+            --danger: #b91c1c;
+            --shadow: 0 18px 40px rgba(15, 23, 42, 0.12);
         }
 
-        .section {
-            background: white;
-            border: 1px solid #ddd;
-            padding: 20px;
-            margin-bottom: 20px;
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Space Grotesk", "Segoe UI", sans-serif;
+            margin: 0;
+            min-height: 100vh;
+            background: radial-gradient(circle at top left, var(--bg-accent), var(--bg));
+            color: var(--text);
+        }
+
+        header {
+            padding: 32px 20px 20px;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            margin: 0 0 6px;
+            font-size: 32px;
+        }
+
+        p.subtitle {
+            margin: 0;
+            color: var(--muted);
+        }
+
+        .toolbar {
+            margin-top: 20px;
+            background: var(--card);
+            border-radius: 14px;
+            padding: 16px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+            box-shadow: var(--shadow);
+        }
+
+        .toolbar label {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .toolbar input {
+            flex: 1;
+            min-width: 220px;
+        }
+
+        main {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 20px 40px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 18px;
+            margin-top: 24px;
+        }
+
+        .card {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 18px;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .card h2 {
+            margin: 0;
+            font-size: 20px;
+        }
+
+        .card small {
+            color: var(--muted);
+        }
+
+        .actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .panel {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .panel h3 {
+            margin: 0;
+            font-size: 15px;
+        }
+
+        .fields {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 8px;
+        }
+
+        input {
+            padding: 8px 10px;
+            border: 1px solid #d1d5db;
             border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            font-size: 14px;
         }
 
         button {
             cursor: pointer;
-            padding: 10px 15px;
-            background: #28a745;
+            padding: 9px 14px;
+            background: var(--accent);
             color: white;
             border: none;
-            border-radius: 4px;
-            font-weight: bold;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            transition: transform 0.2s ease, background 0.2s ease;
         }
 
         button:hover {
-            background: #218838;
+            background: var(--accent-strong);
+            transform: translateY(-1px);
         }
 
-        .btn-health {
-            background: #17a2b8;
+        button.secondary {
+            background: #334155;
+        }
+
+        button.warning {
+            background: var(--warning);
+        }
+
+        button.danger {
+            background: var(--danger);
         }
 
         pre {
-            background: #272822;
-            color: #f8f8f2;
-            padding: 15px;
-            border-radius: 4px;
+            background: #0f172a;
+            color: #e2e8f0;
+            padding: 18px;
+            border-radius: 14px;
             overflow-x: auto;
-            min-height: 50px;
+            min-height: 120px;
+            font-family: "Source Code Pro", monospace;
+            font-size: 13px;
         }
 
-        input {
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            margin-right: 5px;
-        }
-
-        h2 {
-            color: #333;
-            margin-top: 0;
+        footer {
+            max-width: 1100px;
+            margin: 24px auto 0;
+            padding: 0 20px 40px;
+            color: var(--muted);
+            font-size: 13px;
         }
     </style>
 </head>
 
 <body>
-    <h1>🚀 Microservices Tester</h1>
-
-    <div class="section">
-        <h2>Service Users (Port 5001)</h2>
-        <button class="btn-health" onclick="apiCall('/api/users/health')">Vérifier Santé (Health)</button>
-        <button onclick="apiCall('/api/users/')">Lister les Users (GET)</button>
-        <br><br>
-        <div style="background: #eee; padding: 10px; border-radius: 5px; margin-bottom: 10px;">
-            <strong>Ajouter un utilisateur :</strong><br><br>
-            <input type="text" id="username" placeholder="Nom (ex: Robin)">
-            <input type="email" id="email" placeholder="Email (ex: robin@studi.fr)">
-            <input type="password" id="password" placeholder="Mot de passe">
-            <button onclick="createUser()">Créer (POST)</button>
+    <header>
+        <h1>Microservices Console</h1>
+        <p class="subtitle">Tester toutes les APIs via le gateway, sans coder d'URL.</p>
+        <div class="toolbar">
+            <label for="apiBase">Base URL</label>
+            <input id="apiBase" type="text" value="http://localhost" placeholder="http://localhost">
+            <button class="secondary" id="saveBase">Appliquer</button>
         </div>
+    </header>
 
-        <div style="background: #eee; padding: 10px; border-radius: 5px; margin-bottom: 10px;">
-            <strong>Gérer un utilisateur (avec ID) :</strong><br><br>
-            <input type="text" id="userId" placeholder="ID (ex: 1)" style="width: 100px;">
-            <button onclick="getUser()">Voir Détail (GET)</button>
-            <button class="btn-health" style="background: #dc3545;" onclick="deleteUser()">Supprimer (DELETE)</button>
-            <br><br>
-            <strong>Mettre à jour l'utilisateur ci-dessus :</strong><br><br>
-            <input type="text" id="updateUsername" placeholder="Nouveau Nom">
-            <input type="email" id="updateEmail" placeholder="Nouvel Email">
-            <input type="password" id="updatePassword" placeholder="Nouveau Mot de passe">
-            <button style="background: #ffc107; color: #000;" onclick="updateUser()">Modifier (PUT)</button>
+    <main>
+        <div class="grid" id="services"></div>
+
+        <div class="card" style="margin-top: 24px;">
+            <h2>Console de reponse</h2>
+            <pre id="output">Clique sur une action pour tester une route...</pre>
         </div>
+    </main>
 
-        <div style="background: #eee; padding: 10px; border-radius: 5px;">
-            <strong>Se connecter :</strong><br><br>
-            <input type="text" id="loginIdent" placeholder="Username OU Email">
-            <input type="password" id="loginPassword" placeholder="Mot de passe">
-            <button onclick="loginUser()">Connexion (POST)</button>
-        </div>
-    </div>
-
-    <div class="section">
-        <h2>Console de Réponse :</h2>
-        <pre id="output">Cliquez sur un bouton pour tester les routes...</pre>
-    </div>
+    <footer>
+        Les appels passent par le gateway (`/api/*`). Assure-toi que Docker est lance.
+    </footer>
 
     <script>
         const output = document.getElementById('output');
+        const servicesContainer = document.getElementById('services');
+        const baseInput = document.getElementById('apiBase');
+        const saveBaseBtn = document.getElementById('saveBase');
 
-        // Fonction unique et générique pour tous les appels d'API
-        async function apiCall(url, options = {}) {
-            const fullUrl = url.startsWith('/') ? 'http://localhost' + url : url;
-            output.textContent = "Chargement...";
+        let apiBase = baseInput.value.trim();
+
+        const services = [
+            {
+                id: 'users',
+                title: 'Users',
+                port: 5001,
+                basePath: '/api/users',
+                idLabel: 'User ID',
+                create: {
+                    title: 'Creer un utilisateur',
+                    fields: [
+                        { name: 'username', placeholder: 'username', required: true },
+                        { name: 'email', placeholder: 'email', required: true },
+                        { name: 'password', placeholder: 'mot de passe', type: 'password', required: true },
+                    ],
+                },
+                update: {
+                    title: 'Mettre a jour',
+                    fields: [
+                        { name: 'username', placeholder: 'nouveau username' },
+                        { name: 'email', placeholder: 'nouvel email' },
+                        { name: 'password', placeholder: 'nouveau mot de passe', type: 'password' },
+                    ],
+                },
+                extras: [
+                    {
+                        id: 'login',
+                        title: 'Connexion',
+                        path: '/login',
+                        method: 'POST',
+                        button: 'Se connecter',
+                        fields: [
+                            { name: 'ident', placeholder: 'username ou email', required: true },
+                            { name: 'password', placeholder: 'mot de passe', type: 'password', required: true },
+                        ],
+                        buildBody: (values) => {
+                            return values.ident.includes('@')
+                                ? { email: values.ident, password: values.password }
+                                : { username: values.ident, password: values.password };
+                        },
+                    },
+                ],
+            },
+            {
+                id: 'products',
+                title: 'Products',
+                port: 5002,
+                basePath: '/api/products',
+                idLabel: 'Product ID',
+                create: {
+                    title: 'Creer un produit',
+                    fields: [
+                        { name: 'name', placeholder: 'nom', required: true },
+                        { name: 'price', placeholder: 'prix', type: 'number', required: true },
+                        { name: 'stock', placeholder: 'stock', type: 'number', required: true },
+                    ],
+                },
+                update: {
+                    title: 'Mettre a jour',
+                    fields: [
+                        { name: 'name', placeholder: 'nom' },
+                        { name: 'price', placeholder: 'prix', type: 'number' },
+                        { name: 'stock', placeholder: 'stock', type: 'number' },
+                    ],
+                },
+            },
+            {
+                id: 'orders',
+                title: 'Orders',
+                port: 5003,
+                basePath: '/api/orders',
+                idLabel: 'Order ID',
+                create: {
+                    title: 'Creer une commande',
+                    fields: [
+                        { name: 'user_id', placeholder: 'user_id', type: 'number', required: true },
+                        { name: 'product_id', placeholder: 'product_id', type: 'number', required: true },
+                        { name: 'quantity', placeholder: 'quantity', type: 'number', required: true },
+                    ],
+                },
+                update: null,
+                extras: [
+                    {
+                        id: 'byUser',
+                        title: 'Commandes par utilisateur',
+                        path: (values) => `/user/${values.user_id}`,
+                        method: 'GET',
+                        button: 'Lister',
+                        fields: [
+                            { name: 'user_id', placeholder: 'user_id', type: 'number', required: true },
+                        ],
+                    },
+                ],
+            },
+        ];
+
+        function setBaseUrl() {
+            apiBase = baseInput.value.trim() || 'http://localhost';
+            output.textContent = `Base URL mise a jour: ${apiBase}`;
+        }
+
+        saveBaseBtn.addEventListener('click', setBaseUrl);
+
+        function buildUrl(path) {
+            if (path.startsWith('http')) return path;
+            if (path.startsWith('/')) return `${apiBase}${path}`;
+            return `${apiBase}/${path}`;
+        }
+
+        async function apiCall(path, options = {}) {
+            const url = buildUrl(path);
+            output.textContent = 'Chargement...';
             try {
-                const response = await fetch(fullUrl, options);
-                const data = await response.json();
+                const response = await fetch(url, options);
+                const text = await response.text();
+                let data;
+                if (!text) {
+                    data = { status: response.status };
+                } else {
+                    try {
+                        data = JSON.parse(text);
+                    } catch (parseError) {
+                        data = { status: response.status, raw: text };
+                    }
+                }
                 output.textContent = JSON.stringify(data, null, 2);
             } catch (error) {
-                output.textContent = `Erreur : ${error.message}\n(Vérifiez que Docker tourne bien)`;
+                output.textContent = `Erreur : ${error.message}\n(Vérifie que Docker tourne)`;
             }
         }
 
-        // Fonction pour récupérer les valeurs et appeler apiCall en POST
-        function createUser() {
-            const username = document.getElementById('username').value.trim();
-            const email = document.getElementById('email').value.trim();
-            const password = document.getElementById('password').value.trim();
+        function renderInput(field, serviceId, groupId) {
+            const input = document.createElement('input');
+            input.type = field.type || 'text';
+            input.placeholder = field.placeholder;
+            input.dataset.service = serviceId;
+            input.dataset.group = groupId;
+            input.dataset.field = field.name;
+            return input;
+        }
 
-            if (!username || !email || !password) {
-                return alert("Veuillez remplir tous les champs (Nom, Email, Mot de passe) !");
-            }
-
-            apiCall('/api/users/', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, email, password })
+        function getGroupValues(serviceId, groupId) {
+            const inputs = document.querySelectorAll(`input[data-service="${serviceId}"][data-group="${groupId}"]`);
+            const values = {};
+            inputs.forEach((input) => {
+                const value = input.value.trim();
+                if (value !== '') values[input.dataset.field] = value;
             });
+            return values;
         }
 
-        function getUser() {
-            const id = document.getElementById('userId').value.trim();
-            if (!id) return alert("Veuillez renseigner l'ID !");
-            apiCall('/api/users/' + id);
+        function validateFields(fields, values) {
+            const missing = fields.filter((field) => field.required && !values[field.name]);
+            if (missing.length > 0) {
+                alert('Champs requis manquants: ' + missing.map((field) => field.name).join(', '));
+                return false;
+            }
+            return true;
         }
 
-        function deleteUser() {
-            const id = document.getElementById('userId').value.trim();
-            if (!id) return alert("Veuillez renseigner l'ID !");
-            apiCall('/api/users/' + id, { method: 'DELETE' });
+        function normalizeValues(fields, values) {
+            const normalized = { ...values };
+            fields.forEach((field) => {
+                if (field.type === 'number' && normalized[field.name] !== undefined) {
+                    const numberValue = Number(normalized[field.name]);
+                    if (Number.isNaN(numberValue)) {
+                        normalized[field.name] = undefined;
+                    } else {
+                        normalized[field.name] = numberValue;
+                    }
+                }
+            });
+            return normalized;
         }
 
-        function updateUser() {
-            const id = document.getElementById('userId').value.trim();
-            if (!id) return alert("Veuillez renseigner l'ID !");
-            
-            const username = document.getElementById('updateUsername').value.trim();
-            const email = document.getElementById('updateEmail').value.trim();
-            const password = document.getElementById('updatePassword').value.trim();
-            
-            const body = {};
-            if (username) body.username = username;
-            if (email) body.email = email;
-            if (password) body.password = password;
+        function renderService(service) {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.innerHTML = `
+                <div>
+                    <h2>${service.title}</h2>
+                    <small>Port ${service.port} - ${service.basePath}</small>
+                </div>
+                <div class="actions">
+                    <button data-action="health" data-service="${service.id}">Health</button>
+                    <button class="secondary" data-action="list" data-service="${service.id}">Lister</button>
+                </div>
+                <div class="panel">
+                    <h3>Detail / Suppression</h3>
+                    <div class="fields" data-group="${service.id}-detail"></div>
+                    <div class="actions">
+                        <button class="secondary" data-action="detail" data-service="${service.id}">Voir</button>
+                        <button class="danger" data-action="delete" data-service="${service.id}">Supprimer</button>
+                    </div>
+                </div>
+            `;
 
-            if (Object.keys(body).length === 0) {
-                return alert("Veuillez renseigner au moins un champ à modifier !");
+            const detailFields = card.querySelector(`[data-group="${service.id}-detail"]`);
+            detailFields.appendChild(renderInput({ name: 'id', placeholder: service.idLabel, required: true }, service.id, `${service.id}-detail`));
+
+            if (service.create) {
+                const createPanel = document.createElement('div');
+                createPanel.className = 'panel';
+                createPanel.innerHTML = `
+                    <h3>${service.create.title}</h3>
+                    <div class="fields" data-group="${service.id}-create"></div>
+                    <button data-action="create" data-service="${service.id}">Creer</button>
+                `;
+                const fieldContainer = createPanel.querySelector('.fields');
+                service.create.fields.forEach((field) => fieldContainer.appendChild(renderInput(field, service.id, `${service.id}-create`)));
+                card.appendChild(createPanel);
             }
 
-            apiCall('/api/users/' + id, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(body)
-            });
-        }
-
-        function loginUser() {
-            const ident = document.getElementById('loginIdent').value.trim();
-            const password = document.getElementById('loginPassword').value.trim();
-
-            if (!ident || !password) {
-                return alert("Veuillez remplir les deux champs !");
+            if (service.update) {
+                const updatePanel = document.createElement('div');
+                updatePanel.className = 'panel';
+                updatePanel.innerHTML = `
+                    <h3>${service.update.title}</h3>
+                    <div class="fields" data-group="${service.id}-update"></div>
+                    <button class="warning" data-action="update" data-service="${service.id}">Mettre a jour</button>
+                `;
+                const fieldContainer = updatePanel.querySelector('.fields');
+                service.update.fields.forEach((field) => fieldContainer.appendChild(renderInput(field, service.id, `${service.id}-update`)));
+                card.appendChild(updatePanel);
             }
 
-            const body = ident.includes('@') ? { email: ident, password } : { username: ident, password };
+            if (service.extras) {
+                service.extras.forEach((extra) => {
+                    const extraPanel = document.createElement('div');
+                    extraPanel.className = 'panel';
+                    extraPanel.innerHTML = `
+                        <h3>${extra.title}</h3>
+                        <div class="fields" data-group="${service.id}-${extra.id}"></div>
+                        <button data-action="extra" data-extra="${extra.id}" data-service="${service.id}">${extra.button || 'Executer'}</button>
+                    `;
+                    const fieldContainer = extraPanel.querySelector('.fields');
+                    extra.fields.forEach((field) => fieldContainer.appendChild(renderInput(field, service.id, `${service.id}-${extra.id}`)));
+                    card.appendChild(extraPanel);
+                });
+            }
 
-            apiCall('/api/users/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(body)
-            });
+            return card;
         }
+
+        function renderServices() {
+            servicesContainer.innerHTML = '';
+            services.forEach((service) => servicesContainer.appendChild(renderService(service)));
+        }
+
+        servicesContainer.addEventListener('click', (event) => {
+            const button = event.target.closest('button');
+            if (!button) return;
+
+            const action = button.dataset.action;
+            const serviceId = button.dataset.service;
+            const service = services.find((s) => s.id === serviceId);
+            if (!service) return;
+
+            if (action === 'health') {
+                return apiCall(`${service.basePath}/health`);
+            }
+
+            if (action === 'list') {
+                return apiCall(`${service.basePath}/`);
+            }
+
+            if (action === 'detail' || action === 'delete') {
+                const values = getGroupValues(service.id, `${service.id}-detail`);
+                if (!values.id) return alert('ID requis');
+                const method = action === 'delete' ? 'DELETE' : 'GET';
+                return apiCall(`${service.basePath}/${values.id}`, { method });
+            }
+
+            if (action === 'create') {
+                const values = getGroupValues(service.id, `${service.id}-create`);
+                if (!validateFields(service.create.fields, values)) return;
+                const body = normalizeValues(service.create.fields, values);
+                return apiCall(`${service.basePath}/`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body),
+                });
+            }
+
+            if (action === 'update') {
+                const detailValues = getGroupValues(service.id, `${service.id}-detail`);
+                if (!detailValues.id) return alert('ID requis');
+                const values = getGroupValues(service.id, `${service.id}-update`);
+                if (Object.keys(values).length === 0) return alert('Aucun champ a modifier');
+                const body = normalizeValues(service.update.fields, values);
+                return apiCall(`${service.basePath}/${detailValues.id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body),
+                });
+            }
+
+            if (action === 'extra') {
+                const extraId = button.dataset.extra;
+                const extra = service.extras.find((item) => item.id === extraId);
+                if (!extra) return;
+
+                const values = getGroupValues(service.id, `${service.id}-${extra.id}`);
+                if (extra.fields && !validateFields(extra.fields, values)) return;
+
+                const body = extra.buildBody ? extra.buildBody(values) : normalizeValues(extra.fields, values);
+                const path = typeof extra.path === 'function' ? extra.path(values) : extra.path;
+
+                if (extra.method === 'GET') {
+                    return apiCall(`${service.basePath}${path}`);
+                }
+
+                return apiCall(`${service.basePath}${path}`, {
+                    method: extra.method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body),
+                });
+            }
+        });
+
+        renderServices();
     </script>
 </body>
 

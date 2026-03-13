@@ -66,6 +66,45 @@ services:
     networks:
       - users-net
       - ecommerce-network
+    healthcheck:
+      test: ["CMD-SHELL", "node -e \"require('http').get('http://127.0.0.1:5001/health',res=>process.exit(res.statusCode===200?0:1)).on('error',()=>process.exit(1))\""]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  products:
+    build: ./services/products
+    container_name: products-api
+    restart: unless-stopped
+    env_file: .env
+    depends_on:
+      db-products:
+        condition: service_healthy
+    networks:
+      - products-net
+      - ecommerce-network
+    healthcheck:
+      test: ["CMD-SHELL", "node -e \"require('http').get('http://127.0.0.1:5002/health',res=>process.exit(res.statusCode===200?0:1)).on('error',()=>process.exit(1))\""]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  orders:
+    build: ./services/orders
+    container_name: orders-api
+    restart: unless-stopped
+    env_file: .env
+    depends_on:
+      db-orders:
+        condition: service_healthy
+    networks:
+      - orders-net
+      - ecommerce-network
+    healthcheck:
+      test: ["CMD-SHELL", "node -e \"require('http').get('http://127.0.0.1:5003/health',res=>process.exit(res.statusCode===200?0:1)).on('error',()=>process.exit(1))\""]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   # INFRASTRUCTURE
   gateway:
@@ -73,10 +112,14 @@ services:
     container_name: api-gateway
     restart: unless-stopped
     ports:
-      - "80:80"
+      - "80:8080"
     depends_on:
       users:
-        condition: service_started
+        condition: service_healthy
+      products:
+        condition: service_healthy
+      orders:
+        condition: service_healthy
     networks:
       - ecommerce-network
 
