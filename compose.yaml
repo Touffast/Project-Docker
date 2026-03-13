@@ -1,0 +1,92 @@
+services:
+  # BDD
+  db-users:
+    image: postgres:15-alpine
+    container_name: db-users
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${USERS_DB}
+    volumes:
+      - users_data:/var/lib/postgresql/data
+    networks:
+      - users-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${USERS_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  db-products:
+    image: postgres:15-alpine
+    container_name: db-products
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${PRODUCTS_DB}
+    volumes:
+      - products_data:/var/lib/postgresql/data
+    networks:
+      - products-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${PRODUCTS_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  db-orders:
+    image: postgres:15-alpine
+    container_name: db-orders
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${ORDERS_DB}
+    volumes:
+      - orders_data:/var/lib/postgresql/data
+    networks:
+      - orders-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${ORDERS_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+# SERVICES API
+  users:
+    build: ./services/users
+    container_name: users-api
+    restart: unless-stopped
+    env_file: .env
+    depends_on:
+      db-users:
+        condition: service_healthy
+    networks:
+      - users-net
+      - ecommerce-network
+
+  # INFRASTRUCTURE
+  gateway:
+    build: ./gateway
+    container_name: api-gateway
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      users:
+        condition: service_started
+    networks:
+      - ecommerce-network
+
+networks:
+  users-net:
+  products-net:
+  orders-net:
+  ecommerce-network:
+
+volumes:
+  users_data:
+  products_data:
+  orders_data:

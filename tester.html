@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Test API Microservices</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            line-height: 1.6;
+            background: #f9f9f9;
+        }
+
+        .section {
+            background: white;
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        button {
+            cursor: pointer;
+            padding: 10px 15px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background: #218838;
+        }
+
+        .btn-health {
+            background: #17a2b8;
+        }
+
+        pre {
+            background: #272822;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+            min-height: 50px;
+        }
+
+        input {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-right: 5px;
+        }
+
+        h2 {
+            color: #333;
+            margin-top: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>🚀 Microservices Tester</h1>
+
+    <div class="section">
+        <h2>Service Users (Port 5001)</h2>
+        <button class="btn-health" onclick="apiCall('/api/users/health')">Vérifier Santé (Health)</button>
+        <button onclick="apiCall('/api/users/')">Lister les Users (GET)</button>
+        <br><br>
+        <div style="background: #eee; padding: 10px; border-radius: 5px;">
+            <strong>Ajouter un utilisateur :</strong><br><br>
+            <input type="text" id="username" placeholder="Nom (ex: Robin)">
+            <input type="email" id="email" placeholder="Email (ex: robin@studi.fr)">
+            <button onclick="createUser()">Créer (POST)</button>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Console de Réponse :</h2>
+        <pre id="output">Cliquez sur un bouton pour tester les routes...</pre>
+    </div>
+
+    <script>
+        const output = document.getElementById('output');
+
+        // Fonction unique et générique pour tous les appels d'API
+        async function apiCall(url, options = {}) {
+            const fullUrl = url.startsWith('/') ? 'http://localhost' + url : url;
+            output.textContent = "Chargement...";
+            try {
+                const response = await fetch(fullUrl, options);
+                const data = await response.json();
+                output.textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                output.textContent = `Erreur : ${error.message}\n(Vérifiez que Docker tourne bien)`;
+            }
+        }
+
+        // Fonction pour récupérer les valeurs et appeler apiCall en POST
+        function createUser() {
+            const username = document.getElementById('username').value.trim();
+            const email = document.getElementById('email').value.trim();
+
+            if (!username || !email) {
+                return alert("Veuillez remplir les deux champs !");
+            }
+
+            apiCall('/api/users/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, email })
+            });
+        }
+    </script>
+</body>
+
+</html>
